@@ -166,47 +166,77 @@
   }
   window.addEventListener('afterprint',()=>{$('printArea').classList.add('hidden')});
   $('pdfSelf').onclick=generatePDF;
-  $('send').onclick=async()=>{
+  function downloadCsvFile(){
+    if(!profile){notify('Renseigne d\'abord ton matricule.');return}
+    const day=sales.filter(s=>s.date===iso());
+    if(!day.length){notify('Aucune vente à télécharger.');return}
+    const {blob,name}=csvBlobAndName();
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+    notify('Fichier CSV téléchargé : '+name);
+  }
+  const dlBtn=document.createElement('button');
+  dlBtn.className='outline';
+  dlBtn.textContent='📥 Télécharger CSV';
+  dlBtn.onclick=downloadCsvFile;
+  $('pdfSelf').parentNode.insertBefore(dlBtn,$('pdfSelf'));
+
+  $('send').onclick=()=>{
     if(!profile){notify('Renseigne d\'abord ton matricule.');return}
     const day=sales.filter(s=>s.date===iso());
     if(!day.length){notify('Aucune vente du jour à transmettre.');return}
     if(!navigator.onLine){notify('Connecte-toi à internet pour envoyer le rapport, puis appuie de nouveau sur Envoyer.');return}
     const total=day.reduce((a,s)=>a+s.amount,0);
     const {blob,name}=csvBlobAndName();
-    const btn=$('send'),label=btn.textContent;
-    btn.disabled=true;btn.textContent='Envoi en cours…';
-    try{
-      if(location.protocol==='file:'){
-        throw new Error('local-file');
-      }
-      if(!/^https?:$/.test(location.protocol)){
-        throw new Error('web-server');
-      }
-      const fd=new FormData();
-      fd.append('_subject','CAOLY — Ventes du jour — '+profile.nom+' — '+iso());
-      fd.append('_template','table');
-      fd.append('_captcha','false');
-      fd.append('_url',location.href);
-      fd.append('Commercial',profile.nom);
-      fd.append('Matricule',profile.matricule);
-      fd.append('Date',iso());
-      fd.append('Nombre_de_ventes',String(day.length));
-      fd.append('Montant_total',money(total));
-      fd.append('attachment',new File([blob],name,{type:'text/csv'}));
-      const res=await fetch(FORMSUBMIT_ENDPOINT,{method:'POST',body:fd,headers:{'Accept':'application/json'}});
-      let data=null;try{data=await res.json()}catch(_){data=null}
-      if(!res.ok||!data||String(data.success).toLowerCase()!=='true'){
-        const message=data&&data.message?data.message:'Réponse invalide du service d’envoi';
-        throw new Error(message);
-      }
-      notify('Rapport envoyé à la responsable ✅');
-    }catch(e){
-      const local=e&&e.message==='local-file';
-      const reason=local?'Ouvre le carnet via une adresse HTTP/HTTPS : FormSubmit refuse les fichiers ouverts en file://.':(e&&e.message==='web-server'?'Le carnet doit être ouvert depuis un serveur HTTP/HTTPS.':'Envoi non confirmé : '+(e&&e.message?e.message:'connexion indisponible'));
-      notify(reason+' Aucun fichier n’a été téléchargé : réessaie après avoir ouvert le carnet via HTTP/HTTPS et vérifié la connexion.');
-    }finally{
-      btn.disabled=false;btn.textContent=label;
+    
+    let form=document.getElementById('hiddenFormSubmit');
+    if(!form){
+      form=document.createElement('form');
+      form.id='hiddenFormSubmit';
+      form.method='POST';
+      form.action='https://formsubmit.co/'+EMAIL_RESPONSABLE;
+      form.enctype='multipart/form-data';
+      form.style.display='none';
+      document.body.appendChild(form);
     }
+    form.innerHTML='';
+
+    const fields={
+      '_subject':'CAOLY — Ventes du jour — '+profile.nom+' — '+iso(),
+      '_template':'table',
+      '_captcha':'false',
+      '_next':location.href,
+      'Commercial':profile.nom,
+      'Matricule':profile.matricule,
+      'Date':iso(),
+      'Nombre_de_ventes':String(day.length),
+      'Montant_total':money(total)
+    };
+
+    for(const key in fields){
+      const input=document.createElement('input');
+      input.type='hidden';
+      input.name=key;
+      input.value=fields[key];
+      form.appendChild(input);
+    }
+
+    const fileInput=document.createElement('input');
+    fileInput.type='file';
+    fileInput.name='attachment';
+    const file=new File([blob],name,{type:'text/csv'});
+    const container=new DataTransfer();
+    container.items.add(file);
+    fileInput.files=container.files;
+    form.appendChild(fileInput);
+
+    notify('Envoi du rapport avec la pièce jointe CSV en cours…');
+    form.submit();
   };
   $('resetDay').onclick=()=>{
     if(!sales.length){notify('Aucune donnée à réinitialiser.');return}
