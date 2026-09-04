@@ -186,57 +186,49 @@
   dlBtn.onclick=downloadCsvFile;
   $('pdfSelf').parentNode.insertBefore(dlBtn,$('pdfSelf'));
 
-  $('send').onclick=()=>{
+  $('send').onclick=async()=>{
     if(!profile){notify('Renseigne d\'abord ton matricule.');return}
     const day=sales.filter(s=>s.date===iso());
     if(!day.length){notify('Aucune vente du jour à transmettre.');return}
-    if(!navigator.onLine){notify('Connecte-toi à internet pour envoyer le rapport, puis appuie de nouveau sur Envoyer.');return}
     const total=day.reduce((a,s)=>a+s.amount,0);
     const {blob,name}=csvBlobAndName();
-    
-    let form=document.getElementById('hiddenFormSubmit');
-    if(!form){
-      form=document.createElement('form');
-      form.id='hiddenFormSubmit';
-      form.method='POST';
-      form.action='https://formsubmit.co/'+EMAIL_RESPONSABLE;
-      form.enctype='multipart/form-data';
-      form.style.display='none';
-      document.body.appendChild(form);
-    }
-    form.innerHTML='';
-
-    const fields={
-      '_subject':'CAOLY — Ventes du jour — '+profile.nom+' — '+iso(),
-      '_template':'table',
-      '_captcha':'false',
-      '_next':location.href,
-      'Commercial':profile.nom,
-      'Matricule':profile.matricule,
-      'Date':iso(),
-      'Nombre_de_ventes':String(day.length),
-      'Montant_total':money(total)
-    };
-
-    for(const key in fields){
-      const input=document.createElement('input');
-      input.type='hidden';
-      input.name=key;
-      input.value=fields[key];
-      form.appendChild(input);
-    }
-
-    const fileInput=document.createElement('input');
-    fileInput.type='file';
-    fileInput.name='attachment';
     const file=new File([blob],name,{type:'text/csv'});
-    const container=new DataTransfer();
-    container.items.add(file);
-    fileInput.files=container.files;
-    form.appendChild(fileInput);
 
-    notify('Envoi du rapport avec la pièce jointe CSV en cours…');
-    form.submit();
+    const subject='CAOLY — Ventes du jour — '+profile.nom+' ('+profile.matricule+') — '+iso();
+    const body='Bonjour,\n\nVeuillez trouver ci-joint le rapport des ventes du jour pour '+profile.nom+' (Matricule: '+profile.matricule+').\n\n- Date: '+iso()+'\n- Nombre de ventes: '+day.length+'\n- Chiffre d\'affaires total: '+money(total)+'\n\nCordialement,\n'+profile.nom;
+
+    // 1. Sur smartphone (Android / iOS) : ouverture directe du menu de partage système avec le fichier CSV joint
+    if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
+      try{
+        await navigator.share({
+          files:[file],
+          title:subject,
+          text:body
+        });
+        notify('Choisissez Gmail dans le menu pour envoyer le mail prérempli avec la pièce jointe ✅');
+        return;
+      }catch(err){
+        if(err.name==='AbortError')return;
+        console.warn('Erreur Web Share:',err);
+      }
+    }
+
+    // 2. Sur ordinateur ou navigateur sans Web Share : Téléchargement automatique du CSV et ouverture de Gmail (mailto)
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+
+    const gmailUrl='https://mail.google.com/mail/?view=cm&fs=1&to='+encodeURIComponent(EMAIL_RESPONSABLE)+'&su='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+    const mailtoUrl='mailto:'+encodeURIComponent(EMAIL_RESPONSABLE)+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+    
+    // Essayer d'ouvrir l'interface de rédaction Gmail Web ou le client Mail par défaut
+    window.open(gmailUrl,'_blank') || (window.location.href=mailtoUrl);
+
+    notify('Gmail ouvert ! Le fichier '+name+' a été téléchargé, joignez-le dans le mail.');
   };
   $('resetDay').onclick=()=>{
     if(!sales.length){notify('Aucune donnée à réinitialiser.');return}
