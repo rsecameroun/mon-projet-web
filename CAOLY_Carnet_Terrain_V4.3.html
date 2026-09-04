@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#4a2417">
+  <title>CAOLY — Carnet terrain V4.2</title>
+  <style>
+    /* CAOLY — Carnet terrain V4.2 : saisie hors ligne et transmission FormSubmit via HTTP/HTTPS. */
+    :root{--cacao:#4a2417;--cacao2:#6e3520;--ivoire:#f5f1e8;--papier:#fffdf8;--vert:#4f806f;--vertp:#e3efe9;--or:#d9a62e;--encre:#2e2924;--ligne:#d9d0c3;--ombre:0 10px 30px rgba(74,36,23,.10)}
+    *{box-sizing:border-box} body{margin:0;background:var(--ivoire);color:var(--encre);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif} button,input,select{font:inherit} button{cursor:pointer}
+    .app{max-width:1120px;margin:auto;padding:18px 18px 36px}.top{display:flex;justify-content:space-between;align-items:center;border-bottom:4px solid var(--cacao);padding:4px 0 16px}.brand{display:flex;gap:12px;align-items:center}.mark{width:38px;height:38px;border:4px solid var(--cacao);border-radius:50% 46% 54% 44%;transform:rotate(22deg);position:relative}.mark:after{content:"";position:absolute;left:15px;top:-2px;width:4px;height:34px;background:var(--vert);transform:rotate(-22deg)}.eyebrow,.kicker{font-size:11px;letter-spacing:.16em;font-weight:800;color:var(--vert);text-transform:uppercase}.top h1{font-size:25px;line-height:1;margin:5px 0 0;color:var(--cacao)}.offline{display:flex;align-items:center;gap:7px;background:var(--vertp);border:1px solid #b8d4c8;border-radius:999px;padding:9px 13px;font-size:12px;font-weight:800;color:#28604d}.offline i{width:8px;height:8px;border-radius:50%;background:var(--vert);display:block}
+    .profile{display:flex;align-items:end;justify-content:space-between;gap:18px;padding:22px 0 18px;border-bottom:1px solid var(--ligne)}.profile strong{display:block;color:var(--cacao);font-size:21px;margin-top:5px}.profile-fields{display:flex;gap:14px;flex-wrap:wrap}.field{display:grid;gap:6px;color:#736b62;font-size:12px}.field input,.field select{min-height:44px;border:1px solid var(--ligne);border-radius:6px;background:var(--papier);padding:10px 12px;color:var(--encre);outline:none}.field input:focus,.field select:focus{border-color:var(--vert);box-shadow:0 0 0 3px rgba(79,128,111,.15)}
+    .hero{display:grid;grid-template-columns:1.7fr .8fr;gap:18px;margin:24px 0}.intro{background:var(--cacao);color:#fffaf0;border-left:8px solid var(--or);border-radius:8px;min-height:180px;padding:26px;position:relative;overflow:hidden}.intro h2{font-size:34px;line-height:1;margin:20px 0 10px;max-width:390px}.intro p{max-width:430px;color:#f0ddd0;line-height:1.5;margin:0}.chip{display:inline-flex;align-items:center;justify-content:center;background:var(--or);color:var(--cacao);border-radius:50%;width:32px;height:32px;font-size:12px;font-weight:900}.route{position:absolute;right:-5px;top:0;width:46%;height:100%;opacity:.85;background:linear-gradient(145deg,transparent 28%,rgba(217,166,46,.8) 29%,transparent 30%),linear-gradient(25deg,transparent 47%,#65a18d 48%,transparent 49%),radial-gradient(ellipse at 55% 45%,transparent 31%,rgba(255,250,240,.45) 32%,transparent 33%)}.stop{position:absolute;border:2px solid #fff;border-radius:50%;width:28px;height:28px;display:grid;place-items:center;font-size:9px;font-weight:900}.s1{left:14%;top:22%}.s2{left:49%;top:45%;background:var(--vert)}.s3{right:10%;bottom:18%;background:var(--or);color:var(--cacao)}.stat{background:var(--papier);border:2px solid var(--cacao);border-radius:8px;padding:24px;box-shadow:var(--ombre)}.big{font-size:47px;font-weight:900;color:var(--cacao);line-height:1;margin:25px 0 12px}.big small{font-size:15px;color:#84796e;font-weight:700}.bar{height:8px;background:#e3dfd7;margin:10px 0 19px}.bar span{display:block;height:100%;background:var(--or);width:0}.stat strong{display:block;color:var(--vert);font-size:18px;margin-top:6px}.saved{font-size:12px;color:var(--vert);margin-top:26px}
+    .tabs{display:flex;gap:24px;border-bottom:1px solid var(--ligne);margin-bottom:18px}.tab{background:none;border:0;border-bottom:3px solid transparent;padding:13px 4px;color:#887d70;font-weight:800}.tab.active{color:var(--cacao);border-color:var(--cacao)}.count{display:inline-grid;place-items:center;min-width:22px;height:22px;border-radius:50%;background:var(--vert);color:white;font-size:11px;margin-left:4px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.card{background:var(--papier);border:1px solid var(--ligne);border-top:4px solid var(--cacao);border-radius:7px;padding:20px;box-shadow:0 4px 16px rgba(74,36,23,.04)}.card-head{display:flex;justify-content:space-between;align-items:start;margin-bottom:18px}.card h3{font-size:22px;color:var(--cacao);margin:5px 0 0}.step{border-radius:50%;background:var(--vert);color:#fff;width:28px;height:28px;display:grid;place-items:center;font-weight:900}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.wide{grid-column:1/-1}.quantity{display:grid;grid-template-columns:40px 1fr 40px;border:1px solid var(--ligne);border-radius:6px;overflow:hidden;background:var(--papier)}.quantity button{border:0;background:#f2eee5;font-size:22px;color:var(--cacao)}.quantity input{width:100%;border:0;text-align:center;background:transparent;min-width:0}.amount{border-top:1px dashed var(--ligne);margin-top:18px;padding-top:14px;display:flex;justify-content:space-between;color:#8a7f73;font-size:12px}.amount strong{font-size:19px;color:var(--cacao)}.check{display:flex;gap:10px;align-items:center;background:var(--vertp);padding:14px;border-radius:8px;font-size:13px}.check input{width:20px;height:20px;accent-color:var(--vert)}.check small{display:block;color:#7b746b;margin-top:3px}.primary{width:100%;margin-top:18px;border:0;border-radius:7px;background:var(--cacao);color:#fffaf0;padding:14px;font-weight:900}.primary:hover{background:var(--cacao2)}.outline{border:1px solid var(--cacao);border-radius:6px;background:transparent;color:var(--cacao);padding:10px 13px;font-weight:800}.day-head{display:flex;justify-content:space-between;align-items:center;gap:15px}.day-head h2{color:var(--cacao);margin:4px 0 0}.empty{padding:35px;text-align:center;background:var(--papier);border:1px dashed var(--ligne);border-radius:7px;color:#756c62}.sale{display:grid;grid-template-columns:75px 1fr auto;gap:15px;align-items:center;padding:16px 0;border-bottom:1px solid var(--ligne)}.time{font-weight:900;color:var(--vert)}.sale strong{display:block;color:var(--cacao)}.sale span,.sale small{display:block;color:#786f66;font-size:13px;margin-top:4px}.total{text-align:right;color:var(--cacao);font-weight:900}.delete{display:block;margin:8px 0 0 auto;border:0;background:none;color:#a06755;font-size:12px}.send{display:flex;justify-content:space-between;gap:18px;align-items:center;margin-top:22px;padding:18px;background:#f0e6d3;border-left:5px solid var(--or)}.send h3{margin:4px 0;color:var(--cacao)}.send p{margin:6px 0 0;color:#786f66;font-size:13px}.foot{display:flex;justify-content:space-between;gap:15px;color:#83786c;font-size:12px;margin-top:28px;border-top:1px solid var(--ligne);padding-top:15px}.hidden{display:none!important}.notice{position:fixed;right:18px;bottom:18px;max-width:340px;padding:13px 16px;border-radius:7px;background:var(--cacao);color:#fff;box-shadow:var(--ombre);font-size:13px}
+    @media(max-width:800px){.app{padding:13px 12px 28px}.top h1{font-size:21px}.profile,.hero,.grid{display:block}.profile-fields{margin-top:15px}.profile-fields .field{width:100%}.hero .stat{margin-top:14px}.intro{min-height:230px}.intro h2{font-size:31px}.route{width:52%}.grid .card{margin-top:14px}.form-grid{grid-template-columns:1fr}.wide{grid-column:auto}.send,.day-head{display:block}.send .primary,.day-head .outline{margin-top:14px}.foot{display:block}.foot span{display:block;margin-top:5px}}
+    .field small{display:block;font-size:11px;color:#8a7f73;margin-top:4px;font-weight:400}
+    .tableWrap{overflow-x:auto;border:1px solid var(--ligne);border-radius:7px}
+    table.dayTable{width:100%;border-collapse:collapse;font-size:12.5px;min-width:840px}
+    table.dayTable th{background:var(--cacao);color:#fffaf0;padding:10px 8px;text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+    table.dayTable td{padding:9px 8px;border-bottom:1px solid var(--ligne);white-space:nowrap;color:var(--encre)}
+    table.dayTable tbody tr:hover{background:#faf6ee}
+    table.dayTable .delete{border:0;background:none;color:#a06755;font-weight:900;cursor:pointer;font-size:14px}
+    .statut-paye{color:var(--vert);font-weight:800}.statut-attente{color:#a06755;font-weight:800}
+    .send-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .responsable-line{margin:6px 0 0;font-size:12px;color:#786f66}
+    @media print{body *{visibility:hidden}#printArea,#printArea *{visibility:visible}#printArea{position:absolute;left:0;top:0;width:100%}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <header class="top"><div class="brand"><span class="mark" aria-hidden="true"></span><div><div class="eyebrow">CAOLY / CARNET TERRAIN</div><h1>Ventes du jour</h1></div></div><div class="offline"><i id="connexionDot"></i> <span id="connexionBadge">Hors ligne</span></div></header>
+  <section class="profile"><div><div class="kicker">COMMERCIAL</div><strong id="profileLabel">Profil à compléter</strong></div><div class="profile-fields"><label class="field" id="matriculeField">Matricule<input id="matricule" placeholder="Ex. CM001" autocomplete="off"><small>Saisie unique — ton nom s'enregistre ensuite définitivement sur cet appareil.</small></label></div></section>
+  <section class="hero"><div class="intro"><span class="chip">01</span><h2>Une vente, une fiche.</h2><p>Enregistre chaque commande en quelques secondes. Tout reste sur ce téléphone, même sans réseau.</p><div class="route" aria-hidden="true"><span class="stop s1">01</span><span class="stop s2">02</span><span class="stop s3">03</span></div></div><aside class="stat"><div class="kicker">AUJOURD’HUI</div><div class="big"><span id="saleCount">0</span><small> vente(s)</small></div><div class="bar"><span id="progress"></span></div><div class="kicker">CHIFFRE ENREGISTRÉ</div><strong id="dayTotal">0 F CFA</strong><div class="saved">✓ Sauvegarde locale active<br><span id="draftStatus">Aucun brouillon en cours</span></div></aside></section>
+  <nav class="tabs"><button class="tab active" id="newTab">＋ Nouvelle vente</button><button class="tab" id="dayTab">↻ Ma journée <span class="count" id="tabCount">0</span></button></nav>
+  <main id="entryView" class="grid">
+    <section class="card"><div class="card-head"><div><div class="kicker">ÉTAPE 1 / 3</div><h3>Qui a acheté ?</h3></div><span class="step">A</span></div><div class="form-grid"><label class="field">Date de vente<input id="date" type="date"></label><label class="field">Nom du client<input id="client" placeholder="Nom complet"></label><label class="field">Téléphone<input id="phone" inputmode="tel" placeholder="6 00 00 00 00"></label><label class="field">Ville<select id="city"><option value="">Choisir une ville</option></select></label><label class="field wide hidden" id="customCityWrap">Ville à préciser<input id="customCity" placeholder="Ex. Obala"></label></div></section>
+    <section class="card"><div class="card-head"><div><div class="kicker">ÉTAPE 2 / 3</div><h3>Qu’est-ce qui est vendu ?</h3></div><span class="step">B</span></div><div class="form-grid"><label class="field">Entité<select id="entity"></select></label><label class="field">Catégorie<select id="category"></select></label><label class="field wide">Produit<select id="product"></select></label><label class="field">Conditionnement<select id="pack"></select></label><label class="field">Quantité<div class="quantity"><button type="button" id="minus">−</button><input id="quantity" type="number" min="1" value="1"><button type="button" id="plus">＋</button></div></label></div><div class="amount"><span>Montant estimé</span><strong id="estimate">0 F CFA</strong></div></section>
+    <section class="card"><div class="card-head"><div><div class="kicker">ÉTAPE 3 / 3</div><h3>Encaissement</h3></div><span class="step">C</span></div><label class="check"><input id="paid" type="checkbox"><span><b>Paiement reçu</b><small>Décoche si la vente est à recouvrer.</small></span></label><label class="field hidden" id="paymentDateWrap" style="margin-top:14px">Date du paiement<input id="paymentDate" type="date"></label><button class="primary" id="save">▣ Enregistrer la vente</button></section>
+  </main>
+  <section id="dayView" class="hidden"><div class="day-head"><div><div class="kicker">JOURNAL LOCAL</div><h2>Les ventes déjà notées</h2></div><button class="outline" id="pdfSelf">🖨️ Mon reçu (PDF)</button></div><div id="salesList" class="empty" style="margin-top:18px">La journée commence ici.</div><div id="sendPanel" class="send hidden"><div><div class="kicker">FIN DE TOURNÉE</div><h3>Prêt à transmettre ?</h3><p>La saisie reste hors ligne. Pour l’envoi réel, ouvre ce fichier depuis une adresse HTTP/HTTPS, connecte-toi à internet, puis envoie le rapport. FormSubmit doit être activé une première fois sur l’adresse responsable.</p><p class="responsable-line">Destinataire fixe : <b id="respEmailDisplay"></b></p></div><div class="send-actions"><button class="primary" id="send">📤 Envoyer à la responsable</button><button class="outline" id="resetDay">🔄 Réinitialiser la journée</button></div></div></section>
+  <footer class="foot"><span>⌁ Données enregistrées uniquement sur cet appareil</span><span>Format attendu : fichier CSV/Excel joint à l’e-mail professionnel</span></footer>
+</div><div id="printArea" class="hidden" style="padding:24px"></div><div id="notice" class="notice hidden"></div>
+<script>
+/* CAOLY — JavaScript autonome : localStorage, ventes, export PDF/CSV et envoi FormSubmit contrôlé. */
+(function(){
+  'use strict';
+  const KEY='caoly-standalone-sales-v1', PROFILE_KEY='caoly-standalone-matricule-v1', DRAFT_KEY='caoly-standalone-draft-v1';
+  // Adresse fixe de la responsable — intégrée en back-office, non modifiable depuis l'écran.
+  const EMAIL_RESPONSABLE='adalbert.landry22@gmail.com';
+  // Service d’envoi utilisé quand le fichier est ouvert via HTTP/HTTPS — n’est contacté qu’après clic sur Envoyer.
+  // IMPORTANT : la première soumission déclenche une activation FormSubmit vers l’adresse responsable.
+  // La responsable doit confirmer cette activation une seule fois ; ensuite les transmissions arrivent normalement.
+  const FORMSUBMIT_ENDPOINT='https://formsubmit.co/ajax/'+encodeURIComponent(EMAIL_RESPONSABLE);
+  // ===== BACK-OFFICE : matricule -> nom du commercial =====
+  // La responsable peut ajouter/modifier des commerciaux ici (matricule en MAJUSCULES).
+  const commerciaux={
+    'CM001':'Gabin',
+    'CM002':'Daniel',
+    'CM003':'Joseph',
+    'CM004':'Madi',
+    'CM005':'Levisia'
+  };
+  // ==========================================================
+  const cities=['Yaoundé','Douala','Bafoussam','Bamenda','Garoua','Maroua','Ngaoundéré','Bertoua','Ebolowa','Buea','Limbe','Kumba','Kribi','Edéa','Nkongsamba','Dschang','Foumban','Mbouda','Bafang','Sangmélima','Mbalmayo','Kousseri','Mokolo','Yagoua','Meiganga','Autre'];
+  const products=[
+    {entity:'CAOLY',category:'Boissons',name:'STICKS',packs:['Sachet','Carton'],price:500},
+    {entity:'CAOLY',category:'Boissons',name:'BONBON CHOCOLAT CHAUD',packs:['Sachet','Carton'],price:500},
+    {entity:'CAOLY',category:'Poudres & cacao',name:'POUDRE DE CACAO 500G',packs:['Sachet'],price:2000},
+    {entity:'CAOLY',category:'Poudres & cacao',name:'POUDRE DE CACAO 5KG',packs:['Carton'],price:20000},
+    {entity:'CAOLY',category:'Poudres & cacao',name:'POUDRE DE CACAO 25KG',packs:['Sac'],price:90000},
+    {entity:'CAOLY',category:'Confiserie',name:'PÂTE DE CACAO',packs:['Boîte','Carton'],price:7500},
+    {entity:'META',category:'Boissons',name:'CHOCOLAT À BOIRE',packs:['Sachet','Carton'],price:2500},
+    {entity:'DENKY',category:'Autres',name:'Produit à préciser',packs:['Unité'],price:0}
+  ];
+  const $=id=>document.getElementById(id), money=n=>new Intl.NumberFormat('fr-FR').format(n)+' F CFA', iso=()=>new Date().toISOString().slice(0,10);
+  let sales=[]; try{sales=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){sales=[]}
+  let profile=null; try{profile=JSON.parse(localStorage.getItem(PROFILE_KEY)||'null')}catch(e){profile=null}
+  const state={entity:'CAOLY',category:'Boissons',product:'STICKS',pack:'Sachet',quantity:1};
+  let draftTimer=null;
+  $('date').value=iso(); $('paymentDate').value=iso(); $('respEmailDisplay').textContent=EMAIL_RESPONSABLE;
+  cities.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;$('city').appendChild(o)});
+  const notify=(text)=>{const n=$('notice');n.textContent=text;n.classList.remove('hidden');setTimeout(()=>n.classList.add('hidden'),2800)};
+  function applyProfile(){
+    if(profile&&profile.matricule&&profile.nom){$('matriculeField').classList.add('hidden');$('profileLabel').textContent=profile.nom+' — Matricule '+profile.matricule}
+    else{$('matriculeField').classList.remove('hidden');$('profileLabel').textContent='Profil à compléter'}
+  }
+  applyProfile();
+  function updateConnexionBadge(){const on=navigator.onLine;$('connexionBadge').textContent=on?'En ligne':'Hors ligne';$('connexionDot').style.background=on?'var(--vert)':'#b0a89c'}
+  window.addEventListener('online',updateConnexionBadge); window.addEventListener('offline',updateConnexionBadge); updateConnexionBadge();
+  function lockMatricule(){
+    const val=($('matricule').value||'').trim().toUpperCase(); if(!val)return;
+    const nom=commerciaux[val];
+    if(!nom){notify('Matricule inconnu. Vérifie auprès de la responsable.');return}
+    profile={matricule:val,nom}; localStorage.setItem(PROFILE_KEY,JSON.stringify(profile)); applyProfile();
+    notify('Bienvenue '+nom+' ! Ton profil est désormais enregistré définitivement sur cet appareil.');
+  }
+  $('matricule').addEventListener('blur',lockMatricule);
+  $('matricule').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();lockMatricule()}});
+  const fill=(select,items,value)=>{select.innerHTML='';items.forEach(x=>{const o=document.createElement('option');o.value=x;o.textContent=x;select.appendChild(o)});select.value=items.includes(value)?value:items[0]};
+  function refreshProducts(){
+    const cats=[...new Set(products.filter(p=>p.entity===state.entity).map(p=>p.category))]; fill($('category'),cats,state.category); state.category=$('category').value;
+    const ps=products.filter(p=>p.entity===state.entity&&p.category===state.category); fill($('product'),ps.map(p=>p.name),state.product); state.product=$('product').value;
+    const p=products.find(x=>x.name===state.product)||products[0]; fill($('pack'),p.packs,state.pack); state.pack=$('pack').value; $('estimate').textContent=money(state.quantity*p.price);
+  }
+  fill($('entity'),['CAOLY','META','DENKY'],state.entity); refreshProducts();
+  const draftFields=['date','client','phone','city','customCity','quantity','paid','paymentDate'];
+  function setDraftStatus(text){$('draftStatus').textContent=text}
+  function draftData(){return {date:$('date').value,client:$('client').value,phone:$('phone').value,city:$('city').value,customCity:$('customCity').value,entity:state.entity,category:state.category,product:state.product,pack:state.pack,quantity:state.quantity,paid:$('paid').checked,paymentDate:$('paymentDate').value}}
+  function saveDraft(){
+    try{localStorage.setItem(DRAFT_KEY,JSON.stringify(draftData()));setDraftStatus('Brouillon sauvegardé automatiquement à '+new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}))}
+    catch(e){setDraftStatus('Sauvegarde locale indisponible')}
+  }
+  function queueDraftSave(){clearTimeout(draftTimer);draftTimer=setTimeout(saveDraft,250)}
+  function restoreDraft(){
+    let d=null;try{d=JSON.parse(localStorage.getItem(DRAFT_KEY)||'null')}catch(e){d=null}
+    if(!d)return;
+    if(d.date)$('date').value=d.date;if(typeof d.client==='string')$('client').value=d.client;if(typeof d.phone==='string')$('phone').value=d.phone;
+    state.entity=d.entity||state.entity;state.category=d.category||state.category;state.product=d.product||state.product;state.pack=d.pack||state.pack;state.quantity=Math.max(1,Number(d.quantity)||1);
+    $('entity').value=state.entity;refreshProducts();$('category').value=state.category;refreshProducts();$('product').value=state.product;refreshProducts();$('pack').value=state.pack;
+    $('city').value=d.city||'';$('customCity').value=d.customCity||'';$('customCityWrap').classList.toggle('hidden',$('city').value!=='Autre');$('quantity').value=state.quantity;$('paid').checked=!!d.paid;$('paymentDate').value=d.paymentDate||iso();$('paymentDateWrap').classList.toggle('hidden',!$('paid').checked);refreshProducts();setDraftStatus('Brouillon restauré automatiquement');
+  }
+  $('entity').onchange=()=>{state.entity=$('entity').value;state.category='';state.product='';state.pack='';refreshProducts();queueDraftSave()}; $('category').onchange=()=>{state.category=$('category').value;state.product='';state.pack='';refreshProducts();queueDraftSave()}; $('product').onchange=()=>{state.product=$('product').value;state.pack='';refreshProducts();queueDraftSave()}; $('pack').onchange=()=>{state.pack=$('pack').value;queueDraftSave()};
+  $('quantity').oninput=()=>{state.quantity=Math.max(1,Number($('quantity').value)||1);$('quantity').value=state.quantity;refreshProducts();queueDraftSave()}; $('minus').onclick=()=>{$('quantity').value=Math.max(1,Number($('quantity').value)-1);$('quantity').dispatchEvent(new Event('input'))}; $('plus').onclick=()=>{$('quantity').value=Number($('quantity').value)+1;$('quantity').dispatchEvent(new Event('input'))};
+  $('city').onchange=()=>{$('customCityWrap').classList.toggle('hidden',$('city').value!=='Autre');queueDraftSave()}; $('paid').onchange=()=>{$('paymentDateWrap').classList.toggle('hidden',!$('paid').checked);queueDraftSave()};
+  draftFields.forEach(id=>$(id).addEventListener('input',queueDraftSave));draftFields.forEach(id=>$(id).addEventListener('change',queueDraftSave));
+  restoreDraft();
+  function esc(v){return String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+  function persist(){localStorage.setItem(KEY,JSON.stringify(sales));renderStats()}
+  function renderStats(){const day=sales.filter(s=>s.date===iso()),total=day.reduce((a,s)=>a+s.amount,0);$('saleCount').textContent=day.length;$('tabCount').textContent=day.length;$('dayTotal').textContent=money(total);$('progress').style.width=Math.min(100,day.length*12)+'%';renderList(day)}
+  function tableRows(day){return day.map(s=>`<tr><td>${s.time}</td><td>${esc(s.client)}</td><td>${esc(s.phone)}</td><td>${esc(s.city)}</td><td>${esc(s.entity)}</td><td>${esc(s.product)}</td><td>${esc(s.pack)}</td><td>${s.quantity}</td><td>${money(s.unitPrice)}</td><td>${money(s.amount)}</td><td class="${s.paid?'statut-paye':'statut-attente'}">${s.paid?'Payé':'À recouvrer'}</td><td><button class="delete" data-id="${s.id}">✕</button></td></tr>`).join('')}
+  function renderList(day){
+    const box=$('salesList');
+    $('sendPanel').classList.toggle('hidden',!day.length);
+    if(!day.length){box.className='empty';box.textContent='La journée commence ici.';return}
+    box.className='';
+    box.innerHTML=`<div class="tableWrap"><table class="dayTable"><thead><tr><th>Heure</th><th>Client</th><th>Téléphone</th><th>Ville</th><th>Entité</th><th>Produit</th><th>Cond.</th><th>Qté</th><th>PU</th><th>Montant</th><th>Statut</th><th></th></tr></thead><tbody>${tableRows(day)}</tbody></table></div>`;
+    box.querySelectorAll('.delete').forEach(b=>b.onclick=()=>{sales=sales.filter(s=>s.id!==b.dataset.id);persist();notify('Vente supprimée.')});
+  }
+  $('save').onclick=()=>{
+    if(!profile){notify('Renseigne d\'abord ton matricule avant d\'enregistrer une vente.');return}
+    const city=$('city').value==='Autre'?$('customCity').value.trim():$('city').value;
+    const client=$('client').value.trim(),phone=$('phone').value.trim(),p=products.find(x=>x.name===state.product)||products[0];
+    if(!client||!phone||!city)return notify('Complète le client, le téléphone et la ville.');
+    const sale={id:String(Date.now())+Math.random(),date:$('date').value||iso(),time:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}),matricule:profile.matricule,commercial:profile.nom,client,phone,city,entity:state.entity,category:state.category,product:state.product,pack:state.pack,quantity:state.quantity,unitPrice:p.price,amount:state.quantity*p.price,paid:$('paid').checked,paymentDate:$('paid').checked?$('paymentDate').value:''};
+    sales.unshift(sale);persist();try{localStorage.removeItem(DRAFT_KEY)}catch(e){}setDraftStatus('Aucun brouillon en cours');
+    ['client','phone','customCity'].forEach(id=>$(id).value='');$('city').value='';$('customCityWrap').classList.add('hidden');$('paid').checked=false;$('paymentDateWrap').classList.add('hidden');
+    notify('Vente enregistrée. Retrouve-la dans "Ma journée".');
+  };
+  function csvBlobAndName(){
+    const day=sales.filter(s=>s.date===iso());
+    const head=['DateVente','Heure','Matricule','Commercial','Client','Telephone','Ville','Entite','Categorie','Produit','Conditionnement','Quantite','PrixUnitaire','Montant','Paiement','DatePaiement'];
+    const rows=day.map(s=>[s.date,s.time,s.matricule,s.commercial,s.client,s.phone,s.city,s.entity,s.category,s.product,s.pack,s.quantity,s.unitPrice,s.amount,s.paid?'PAYE':'A_RECOUVRER',s.paymentDate]);
+    const csv='\ufeff'+[head,...rows].map(r=>r.map(v=>'"'+String(v||'').replaceAll('"','""')+'"').join(';')).join('\n');
+    const name=(profile.matricule+'_'+profile.nom).replace(/\s+/g,'_')+'_Ventes_'+iso()+'.csv';
+    return {blob:new Blob([csv],{type:'text/csv;charset=utf-8'}),name};
+  }
+  function generatePDF(){
+    if(!profile){notify('Renseigne d\'abord ton matricule.');return}
+    const day=sales.filter(s=>s.date===iso());
+    if(!day.length){notify('Aucune vente à imprimer aujourd\'hui.');return}
+    const total=day.reduce((a,s)=>a+s.amount,0);
+    $('printArea').innerHTML=`<h2 style="color:#4a2417;margin:0 0 4px">CAOLY — Reçu de ventes (copie commercial)</h2><p style="margin:0 0 14px;color:#555">Commercial : <b>${esc(profile.nom)}</b> — Matricule ${esc(profile.matricule)}<br>Journée du ${iso()} — Édité le ${new Date().toLocaleString('fr-FR')}</p><table class="dayTable"><thead><tr><th>Heure</th><th>Client</th><th>Téléphone</th><th>Ville</th><th>Entité</th><th>Produit</th><th>Cond.</th><th>Qté</th><th>PU</th><th>Montant</th><th>Statut</th></tr></thead><tbody>${day.map(s=>`<tr><td>${s.time}</td><td>${esc(s.client)}</td><td>${esc(s.phone)}</td><td>${esc(s.city)}</td><td>${esc(s.entity)}</td><td>${esc(s.product)}</td><td>${esc(s.pack)}</td><td>${s.quantity}</td><td>${money(s.unitPrice)}</td><td>${money(s.amount)}</td><td>${s.paid?'Payé':'À recouvrer'}</td></tr>`).join('')}</tbody></table><p style="margin-top:14px;font-size:16px"><b>Total du jour : ${money(total)}</b></p>`;
+    $('printArea').classList.remove('hidden');
+    window.print();
+  }
+  window.addEventListener('afterprint',()=>{$('printArea').classList.add('hidden')});
+  $('pdfSelf').onclick=generatePDF;
+  $('send').onclick=async()=>{
+    if(!profile){notify('Renseigne d\'abord ton matricule.');return}
+    const day=sales.filter(s=>s.date===iso());
+    if(!day.length){notify('Aucune vente du jour à transmettre.');return}
+    if(!navigator.onLine){notify('Connecte-toi à internet pour envoyer le rapport, puis appuie de nouveau sur Envoyer.');return}
+    const total=day.reduce((a,s)=>a+s.amount,0);
+    const {blob,name}=csvBlobAndName();
+    const btn=$('send'),label=btn.textContent;
+    btn.disabled=true;btn.textContent='Envoi en cours…';
+    try{
+      if(location.protocol==='file:'){
+        throw new Error('local-file');
+      }
+      if(!/^https?:$/.test(location.protocol)){
+        throw new Error('web-server');
+      }
+      const fd=new FormData();
+      fd.append('_subject','CAOLY — Ventes du jour — '+profile.nom+' — '+iso());
+      fd.append('_template','table');
+      fd.append('_captcha','false');
+      fd.append('_url',location.href);
+      fd.append('Commercial',profile.nom);
+      fd.append('Matricule',profile.matricule);
+      fd.append('Date',iso());
+      fd.append('Nombre_de_ventes',String(day.length));
+      fd.append('Montant_total',money(total));
+      fd.append('attachment',new File([blob],name,{type:'text/csv'}));
+      const res=await fetch(FORMSUBMIT_ENDPOINT,{method:'POST',body:fd,headers:{'Accept':'application/json'}});
+      let data=null;try{data=await res.json()}catch(_){data=null}
+      if(!res.ok||!data||String(data.success).toLowerCase()!=='true'){
+        const message=data&&data.message?data.message:'Réponse invalide du service d’envoi';
+        throw new Error(message);
+      }
+      notify('Rapport envoyé à la responsable ✅');
+    }catch(e){
+      const local=e&&e.message==='local-file';
+      const reason=local?'Ouvre le carnet via une adresse HTTP/HTTPS : FormSubmit refuse les fichiers ouverts en file://.':(e&&e.message==='web-server'?'Le carnet doit être ouvert depuis un serveur HTTP/HTTPS.':'Envoi non confirmé : '+(e&&e.message?e.message:'connexion indisponible'));
+      notify(reason+' Aucun fichier n’a été téléchargé : réessaie après avoir ouvert le carnet via HTTP/HTTPS et vérifié la connexion.');
+    }finally{
+      btn.disabled=false;btn.textContent=label;
+    }
+  };
+  $('resetDay').onclick=()=>{
+    if(!sales.length){notify('Aucune donnée à réinitialiser.');return}
+    if(!confirm('As-tu bien envoyé le fichier des ventes à la responsable ?\nCette action va supprimer toutes les ventes enregistrées sur cet appareil et remettre le compteur à zéro.'))return;
+    sales=[];localStorage.removeItem(KEY);persist();
+    notify('Journée réinitialisée. Prêt pour de nouvelles ventes.');
+  };
+  $('newTab').onclick=()=>{$('entryView').classList.remove('hidden');$('dayView').classList.add('hidden');$('newTab').classList.add('active');$('dayTab').classList.remove('active')};$('dayTab').onclick=()=>{$('entryView').classList.add('hidden');$('dayView').classList.remove('hidden');$('dayTab').classList.add('active');$('newTab').classList.remove('active');renderStats()};
+  renderStats();
+})();
+</script>
+</body></html>
